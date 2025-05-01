@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming Web App</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Gaming Web App</h1>
+    </header>
+
+    <div class="container">
+        <div class="sidebar">
+            <button id="btn-home">Home</button>
+            <button id="btn-snake">Snake Game</button>
+            <button id="btn-tictactoe">Tic-tac-toe</button>
+            <button id="btn-memory">Memory Match</button>
+            <button id="btn-whackamole">Whack-a-Mole</button>
+        </div>
+
+        <div class="game-container">
+            <!-- Welcome Screen -->
+            <div id="welcome-screen" class="welcome-screen">
+                <h2>Welcome to the Gaming Web App!</h2>
+                <p>Select a game from the sidebar to get started.</p>
+                <p>Available games:</p>
+                <ul style="text-align: left; display: inline-block;">
+                    <li><strong>Snake</strong> - Control the snake to eat food and grow without hitting walls or yourself.</li>
+                    <li><strong>Tic-tac-toe</strong> - Classic game of X's and O's. Get three in a row to win!</li>
+                    <li><strong>Memory Match</strong> - Find all matching pairs with the fewest moves and in the shortest time.</li>
+                    <li><strong>Whack-a-Mole</strong> - Click on moles as they appear to score points before time runs out.</li>
+                </ul>
+            </div>
+
+            <!-- Snake Game Screen -->
+            <div id="snake-screen" class="hidden">
+                <canvas id="snake-canvas" width="400" height="400"></canvas>
+                <div class="game-info">
+                    <div class="score">Score: <span id="snake-score">0</span></div>
+                    <div class="controls">
+                        <p>Controls: Use arrow keys to move the snake</p>
+                        <p>Goal: Eat the food (red squares) to grow your snake without hitting walls or yourself</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tic-tac-toe Screen -->
+            <div id="tictactoe-screen" class="hidden">
+                <div class="tictactoe-container">
+                    <div class="tictactoe-status" id="tictactoe-status">Player X's turn</div>
+                    <div class="tictactoe-board" id="tictactoe-board">
+                        <!-- The cells will be added dynamically -->
+                    </div>
+                    <button class="tictactoe-reset" id="tictactoe-reset">Reset Game</button>
+                </div>
+            </div>
+
+            <!-- Memory Match Screen -->
+            <div id="memory-screen" class="hidden">
+                <div class="memory-container">
+                    <div class="memory-info">
+                        <div class="memory-stats">
+                            <div class="memory-stat">Moves: <span id="memory-moves">0</span></div>
+                            <div class="memory-stat">Time: <span id="memory-time">0</span>s</div>
+                        </div>
+                        <div class="memory-difficulty">
+                            <select id="memory-difficulty-select" class="memory-button">
+                                <option value="4">4x4 (Easy)</option>
+                                <option value="6">6x6 (Hard)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="memory-board" id="memory-board">
+                        <!-- Cards will be added dynamically -->
+                    </div>
+                    <div class="memory-controls">
+                        <button class="memory-button" id="memory-reset">New Game</button>
+                    </div>
+                    <div class="memory-won" id="memory-won"></div>
+                </div>
+            </div>
+
+            <!-- Whack-a-Mole Screen -->
+            <div id="whackamole-screen" class="hidden">
+                <div class="whackamole-container">
+                    <div class="whackamole-info">
+                        <div class="whackamole-stats">
+                            <div class="whackamole-stat">Score: <span id="whackamole-score">0</span></div>
+                            <div class="whackamole-stat">Time: <span id="whackamole-time">30</span>s</div>
+                        </div>
+                        <div class="whackamole-difficulty">
+                            <select id="whackamole-difficulty-select" class="whackamole-button">
+                                <option value="easy">Easy</option>
+                                <option value="medium">Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="whackamole-board" id="whackamole-board">
+                        <!-- Holes will be added dynamically -->
+                    </div>
+                    <div class="whackamole-controls">
+                        <button class="whackamole-button" id="whackamole-start">Start Game</button>
+                    </div>
+                    <div class="whackamole-message" id="whackamole-message"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="main.js"></script>
+</body>
+</html>
