@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaming Web App</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Gaming Web App</title>
 </head>
 <body>
+    <button id="hamburger-menu" class="hamburger-menu">☰</button>
+    
     <header>
         <h1>Gaming Web App</h1>
     </header>
 
     <div class="container">
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <button id="btn-home">Home</button>
             <button id="btn-snake">Snake Game</button>
             <button id="btn-tictactoe">Tic-tac-toe</button>
@@ -26,7 +28,7 @@
                 <h2>Welcome to the Gaming Web App!</h2>
                 <p>Select a game from the sidebar to get started.</p>
                 <p>Available games:</p>
-                <ul style="text-align: left; display: inline-block;">
+                <ul>
                     <li><strong>Snake</strong> - Control the snake to eat food and grow without hitting walls or yourself.</li>
                     <li><strong>Tic-tac-toe</strong> - Classic game of X's and O's. Get three in a row to win!</li>
                     <li><strong>Memory Match</strong> - Find all matching pairs with the fewest moves and in the shortest time.</li>
@@ -40,8 +42,14 @@
                 <div class="game-info">
                     <div class="score">Score: <span id="snake-score">0</span></div>
                     <div class="controls">
-                        <p>Controls: Use arrow keys to move the snake</p>
+                        <p>Controls: Use arrow keys or on-screen buttons to move the snake</p>
                         <p>Goal: Eat the food (red squares) to grow your snake without hitting walls or yourself</p>
+                        <div class="direction-controls" id="direction-controls">
+                            <button class="control-btn up-btn" id="up-btn">↑</button>
+                            <button class="control-btn left-btn" id="left-btn">←</button>
+                            <button class="control-btn right-btn" id="right-btn">→</button>
+                            <button class="control-btn down-btn" id="down-btn">↓</button>
+                        </div>
                     </div>
                 </div>
             </div>

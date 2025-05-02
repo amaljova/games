@@ -1,3 +1,18 @@
+// Mobile menu functionality
+const hamburgerMenu = document.getElementById('hamburger-menu');
+const sidebar = document.getElementById('sidebar');
+
+hamburgerMenu.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+});
+
+// Close sidebar when a game is selected on mobile
+function closeSidebarOnMobile() {
+    if (window.innerWidth <= 768) {
+        sidebar.classList.remove('active');
+    }
+}
+
 // Navigation
 const btnHome = document.getElementById('btn-home');
 const btnSnake = document.getElementById('btn-snake');
@@ -23,33 +38,72 @@ function showScreen(screen) {
     screen.classList.remove('hidden');
 }
 
-btnHome.addEventListener('click', () => showScreen(welcomeScreen));
+btnHome.addEventListener('click', () => {
+    showScreen(welcomeScreen);
+    closeSidebarOnMobile();
+});
+
 btnSnake.addEventListener('click', () => {
     showScreen(snakeScreen);
+    closeSidebarOnMobile();
     if (!snakeGameStarted) {
         startSnakeGame();
         snakeGameStarted = true;
+    } else {
+        // Resize canvas for responsive design
+        resizeSnakeCanvas();
     }
 });
+
 btnTictactoe.addEventListener('click', () => {
     showScreen(tictactoeScreen);
+    closeSidebarOnMobile();
     if (!tictactoeInitialized) {
         initTictactoe();
         tictactoeInitialized = true;
     }
 });
+
 btnMemory.addEventListener('click', () => {
     showScreen(memoryScreen);
+    closeSidebarOnMobile();
     if (!memoryInitialized) {
         initMemoryMatch();
         memoryInitialized = true;
     }
 });
+
 btnWhackamole.addEventListener('click', () => {
     showScreen(whackamoleScreen);
+    closeSidebarOnMobile();
     if (!whackamoleInitialized) {
         initWhackaMole();
         whackamoleInitialized = true;
+    }
+});
+
+// Responsive canvas resizing
+function resizeSnakeCanvas() {
+    const canvas = document.getElementById('snake-canvas');
+    const gameContainer = document.querySelector('.game-container');
+    const maxWidth = Math.min(400, gameContainer.clientWidth - 40);
+    
+    canvas.style.width = maxWidth + 'px';
+    canvas.style.height = maxWidth + 'px';
+}
+
+// Listen for window resize events
+window.addEventListener('resize', () => {
+    if (snakeGameStarted) {
+        resizeSnakeCanvas();
+    }
+    if (memoryInitialized) {
+        // Check if memory game is in hard mode
+        const difficultySelect = document.getElementById('memory-difficulty-select');
+        if (difficultySelect.value === '6') {
+            const memoryBoard = document.getElementById('memory-board');
+            memoryBoard.classList.add('hard-mode');
+        }
     }
 });
 
@@ -59,6 +113,9 @@ function startSnakeGame() {
     const canvas = document.getElementById('snake-canvas');
     const ctx = canvas.getContext('2d');
     const scoreElement = document.getElementById('snake-score');
+    
+    // Set up responsive canvas
+    resizeSnakeCanvas();
 
     // Game constants
     const gridSize = 20;
@@ -79,6 +136,7 @@ function startSnakeGame() {
     let foodY = 5;
     
     let gameOver = false;
+    let gameLoopId;
 
     // Main game loop
     function gameLoop() {
@@ -110,30 +168,112 @@ function startSnakeGame() {
         checkFoodCollision();
         
         // Call game loop again
-        setTimeout(gameLoop, 1000 / speed);
+        gameLoopId = setTimeout(gameLoop, 1000 / speed);
     }
 
     // Start listening for keyboard input
     document.addEventListener('keydown', keyDown);
 
+    // Add on-screen control buttons for mobile
+    const upBtn = document.getElementById('up-btn');
+    const leftBtn = document.getElementById('left-btn');
+    const rightBtn = document.getElementById('right-btn');
+    const downBtn = document.getElementById('down-btn');
+
+    upBtn.addEventListener('click', () => {
+        if (velocityY !== 1) {
+            velocityX = 0;
+            velocityY = -1;
+        }
+    });
+
+    leftBtn.addEventListener('click', () => {
+        if (velocityX !== 1) {
+            velocityX = -1;
+            velocityY = 0;
+        }
+    });
+
+    rightBtn.addEventListener('click', () => {
+        if (velocityX !== -1) {
+            velocityX = 1;
+            velocityY = 0;
+        }
+    });
+
+    downBtn.addEventListener('click', () => {
+        if (velocityY !== -1) {
+            velocityX = 0;
+            velocityY = 1;
+        }
+    });
+
+    // Touch event handling for mobile swipe controls
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    canvas.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        e.preventDefault();
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', (e) => {
+        const touchEndX = e.changedTouches[0].clientX;
+        const touchEndY = e.changedTouches[0].clientY;
+        
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+        
+        // Detect swipe direction
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            // Horizontal swipe
+            if (deltaX > 50 && velocityX !== -1) {
+                // Right swipe
+                velocityX = 1;
+                velocityY = 0;
+            } else if (deltaX < -50 && velocityX !== 1) {
+                // Left swipe
+                velocityX = -1;
+                velocityY = 0;
+            }
+        } else {
+            // Vertical swipe
+            if (deltaY > 50 && velocityY !== -1) {
+                // Down swipe
+                velocityX = 0;
+                velocityY = 1;
+            } else if (deltaY < -50 && velocityY !== 1) {
+                // Up swipe
+                velocityX = 0;
+                velocityY = -1;
+            }
+        }
+        e.preventDefault();
+    }, { passive: false });
+
     function keyDown(event) {
         // Up
-        if (event.keyCode === 38 && velocityY !== 1) {
+        if ((event.keyCode === 38 || event.key === 'ArrowUp') && velocityY !== 1) {
             velocityX = 0;
             velocityY = -1;
         }
         // Down
-        else if (event.keyCode === 40 && velocityY !== -1) {
+        else if ((event.keyCode === 40 || event.key === 'ArrowDown') && velocityY !== -1) {
             velocityX = 0;
             velocityY = 1;
         }
         // Left
-        else if (event.keyCode === 37 && velocityX !== 1) {
+        else if ((event.keyCode === 37 || event.key === 'ArrowLeft') && velocityX !== 1) {
             velocityX = -1;
             velocityY = 0;
         }
         // Right
-        else if (event.keyCode === 39 && velocityX !== -1) {
+        else if ((event.keyCode === 39 || event.key === 'ArrowRight') && velocityX !== -1) {
             velocityX = 1;
             velocityY = 0;
         }
@@ -228,10 +368,18 @@ function startSnakeGame() {
         ctx.textAlign = 'center';
         ctx.fillText('Game Over!', canvas.width / 2, canvas.height / 2);
         ctx.font = '20px Arial';
-        ctx.fillText('Press any key to restart', canvas.width / 2, canvas.height / 2 + 30);
+        ctx.fillText('Press any key or tap to restart', canvas.width / 2, canvas.height / 2 + 30);
+        
+        // Add touch event listener for mobile restart
+        canvas.addEventListener('click', resetGame, { once: true });
     }
 
     function resetGame() {
+        // Clear any existing game loop
+        if (gameLoopId) {
+            clearTimeout(gameLoopId);
+        }
+        
         // Reset snake
         snake = [{ x: 10, y: 10 }];
         velocityX = 0;
@@ -272,6 +420,8 @@ function initTictactoe() {
         const cell = document.createElement('div');
         cell.classList.add('tictactoe-cell');
         cell.setAttribute('data-index', i);
+        const span = document.createElement('span');
+        cell.appendChild(span);
         board.appendChild(cell);
     }
     
@@ -297,7 +447,9 @@ function initTictactoe() {
     
     // Handle cell click
     function handleCellClick(clickedCellEvent) {
-        const clickedCell = clickedCellEvent.target;
+        const clickedCell = clickedCellEvent.target.closest('.tictactoe-cell');
+        if (!clickedCell) return;
+        
         const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
         
         // Check if cell is already filled or game is inactive
@@ -307,7 +459,7 @@ function initTictactoe() {
         
         // Update game state
         gameState[clickedCellIndex] = currentPlayer;
-        clickedCell.textContent = currentPlayer;
+        clickedCell.querySelector('span').textContent = currentPlayer;
         
         // Check for win or draw
         checkResult();
@@ -355,16 +507,13 @@ function initTictactoe() {
         statusDisplay.textContent = currentPlayerTurn();
         
         // Clear cells
-        document.querySelectorAll('.tictactoe-cell').forEach(cell => {
-            cell.textContent = '';
+        document.querySelectorAll('.tictactoe-cell span').forEach(span => {
+            span.textContent = '';
         });
     }
     
     // Event listeners
-    document.querySelectorAll('.tictactoe-cell').forEach(cell => {
-        cell.addEventListener('click', handleCellClick);
-    });
-    
+    board.addEventListener('click', handleCellClick);
     resetButton.addEventListener('click', resetGame);
 }
 
@@ -395,9 +544,7 @@ function initMemoryMatch() {
         '🚗', '🚕', '🚙', '🚌', '🏎️', '🚓', '🚑', '🚒',
         '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🎱', '🏓',
         '🎯', '🎮', '🎨', '🎭', '🎪', '🎢', '🎠', '🎬', 
-        '📱', '📲', '💻', '⌨️', '🖥️', '🖨️', '📷', '📹',
-        '💎', '👑', '👒', '👓', '🧤', '👜', '👝', '🎒',
-        '⭐', '🌟', '✨', '💫', '☄️', '🔥', '🌈', '🌊'
+        '📱', '📲', '💻', '⌨️', '🖥️', '🖨️', '📷', '📹'
     ];
     
     // Start game
@@ -413,9 +560,12 @@ function initMemoryMatch() {
         // Clear the board
         board.innerHTML = '';
         
-        // Set grid template based on difficulty
-        board.style.gridTemplateColumns = `repeat(${gridSize}, 100px)`;
-        board.style.gridTemplateRows = `repeat(${gridSize}, 100px)`;
+        // Update class for hard mode if necessary
+        if (gridSize === 6) {
+            board.classList.add('hard-mode');
+        } else {
+            board.classList.remove('hard-mode');
+        }
         
         // Get number of pairs needed
         const numPairs = (gridSize * gridSize) / 2;
@@ -616,6 +766,12 @@ function initWhackaMole() {
         // Add click event to whack the mole
         hole.addEventListener('click', () => whackMole(index));
         
+        // Add touch event for mobile
+        hole.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            whackMole(index);
+        }, { passive: false });
+        
         // Store reference to mole
         holes.push({
             hole: hole,
@@ -790,3 +946,6 @@ function initWhackaMole() {
     // Create the initial board
     createBoard();
 }
+
+// Initialize the welcome screen by default
+showScreen(welcomeScreen);
